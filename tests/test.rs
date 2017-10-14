@@ -11,6 +11,120 @@ fn assert_almost_eq<T: Float + FromPrimitive + Debug>(a: T, b: T) {
     }
 }
 
+mod cephes_double {
+    use special_fun::cephes_double;
+    use super::assert_almost_eq;
+    use std::f64::consts::PI;
+    #[test]
+    fn exp10() {
+        assert_almost_eq(cephes_double::exp10(0.0f64), 1.0);
+        assert_almost_eq(cephes_double::exp10(1.0f64), 10.0);
+        assert_almost_eq(cephes_double::exp10(1.2f64), 15.848931924611133);
+        assert_almost_eq(cephes_double::exp10(1.5f64), 31.622776601683793);
+        assert_almost_eq(cephes_double::exp10(308.2547155599167f64), 1.7976931348620926e308);
+    }
+
+    #[test]
+    fn expm1() {
+        assert_almost_eq(cephes_double::expm1(0.0f64), 0.0);
+        assert_almost_eq(cephes_double::expm1(0.001f64), 0.0010005001667083846);
+        assert_almost_eq(cephes_double::expm1(0.1f64), 0.10517091807564771);
+        assert_almost_eq(cephes_double::expm1(1.0f64), 1.718281828459045);
+    }
+
+    #[test]
+    fn expx2(){
+        assert_almost_eq(cephes_double::expx2(2.0f64, 1), 54.598150033144236);
+        assert_almost_eq(cephes_double::expx2(2.0f64, 2), 54.598150033144236);
+        assert_almost_eq(cephes_double::expx2(2.0f64, -1), 1.0/54.598150033144236);
+        assert_almost_eq(cephes_double::expx2(2.0f64, -2), 1.0/54.598150033144236);
+    }
+
+    #[test]
+    fn ei(){
+        assert_almost_eq(cephes_double::ei(1.0f64), 1.89511781);
+        assert_almost_eq(cephes_double::ei(0.0f64), 0.0);
+        assert_almost_eq(cephes_double::ei(0.6f64), 0.7698812899373594);
+    }
+
+    #[test]
+    fn erf() {
+        assert_almost_eq(cephes_double::erf(0.0f64), 0.0);
+        assert_almost_eq(cephes_double::erf(0.5f64), 0.52049987781304654);
+        assert_almost_eq(cephes_double::erf(-0.5f64), -0.52049987781304654);
+        assert_almost_eq(cephes_double::erf(1.0f64), 0.84270079294971487);
+        assert_almost_eq(cephes_double::erf(-1.0f64), -0.84270079294971487);
+        assert_almost_eq(cephes_double::erf(10.0f64), 0.99999999999999999);
+        assert_almost_eq(cephes_double::erf(-10.0f64), -0.99999999999999999);
+    }
+
+    #[test]
+    fn erfc() {
+        assert_almost_eq(cephes_double::erfc(0.0f64), 1.0 - 0.0);
+        assert_almost_eq(cephes_double::erfc(0.5f64), 1.0 - 0.52049987781304654);
+        assert_almost_eq(cephes_double::erfc(-0.5f64), 1.0 + 0.52049987781304654);
+        assert_almost_eq(cephes_double::erfc(1.0f64), 1.0 - 0.84270079294971487);
+        assert_almost_eq(cephes_double::erfc(-1.0f64), 1.0 + 0.84270079294971487);
+        assert_almost_eq(cephes_double::erfc(10.0f64), 1.0 - 0.99999999999999999);
+        assert_almost_eq(cephes_double::erfc(-10.0f64), 1.0 + 0.99999999999999999);
+    }
+
+    #[test]
+    fn log1p() {
+        assert_almost_eq(cephes_double::log1p(0.0f64), 0.0);
+        assert_almost_eq(cephes_double::log1p(1.0e-5_f64), 0.000009999950000333332);
+        assert_almost_eq(cephes_double::log1p(1.0f64), 0.6931471805599453);
+    }
+
+    #[test]
+    fn spence() {
+        assert_almost_eq(cephes_double::spence(0.0f64), PI*PI/6.0f64);
+        assert_almost_eq(cephes_double::spence(1.0f64), 0.0);
+        assert_almost_eq(cephes_double::spence(2.0f64), -PI*PI/12.0f64);
+    }
+
+    #[test]
+    fn cosm1() {
+        assert_almost_eq(cephes_double::cosm1(0.0f64), 0.0);
+        assert_almost_eq(cephes_double::cosm1(1.0e-5_f64), -0.00000000004999999999958334);
+        assert_almost_eq(cephes_double::cosm1(0.1f64), -0.004995834721974235);
+    }
+
+    #[test]
+    fn sici() {
+        let mut si = 0.0_f64;
+        let mut ci = 0.0_f64;
+
+        cephes_double::sici(0.5_f64, &mut si, &mut ci);
+        assert_almost_eq(si, 0.49310741804306674);
+        assert_almost_eq(ci, -0.17778407880661287);
+
+        cephes_double::sici(0.1_f64, &mut si, &mut ci);
+        assert_almost_eq(si, 0.09994446110827694);
+        assert_almost_eq(ci, -1.7278683866572966);
+
+        cephes_double::sici(0.0_f64, &mut si, &mut ci);
+        assert_almost_eq(si, 0.0);
+    }
+
+    #[test]
+    fn shichi() {
+        let mut shi = 0.0_f64;
+        let mut chi = 0.0_f64;
+
+        cephes_double::shichi(0.5_f64, &mut shi, &mut chi);
+        assert_almost_eq(shi, 0.5069967498196671);
+        assert_almost_eq(chi, -0.05277684495649357);
+
+        cephes_double::shichi(0.1_f64, &mut shi, &mut chi);
+        assert_almost_eq(shi, 0.10005557222505701);
+        assert_almost_eq(chi, -1.7228683861943335);
+
+        cephes_double::shichi(0.0_f64, &mut shi, &mut chi);
+        assert_almost_eq(shi, 0.0);
+    }
+}
+
 mod double {
     use special_fun::FloatSpecial;
     use super::assert_almost_eq;
