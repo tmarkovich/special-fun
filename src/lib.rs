@@ -683,47 +683,403 @@ pub mod cephes_double {
         unsafe { unsafe_cephes_double::incbet(a, b, x) }
     }
 
-    /// Inverse of incomplete beta integral.
+    /// Computes the inverse of incomplete beta integral.
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// Given y, the function finds x such that
+    ///
+    ///  incbet( a, b, x ) = y .
+    ///
+    /// The routine performs interval halving or Newton iterations to find the
+    /// root of incbet(a,b,x) - y = 0.
+    ///
+    ///
+    /// ACCURACY (Relative error):
+    ///
+    /// | arithmetic | domain (x) | domain (a, b) | # trials | peak | rms |
+    /// | :--------: | :--------: | :-----------: | :------: | :--: | :-: |
+    /// |   IEEE     | 0,1        | .5,10000      | 50000    | 5.8e-12 | 1.3e-13 |
+    /// |  IEEE      | 0,1        | .25,100       | 100000   | 1.8e-13 | 3.9e-15 |
+    /// |  IEEE      | 0,1        | 0,5           | 50000    | 1.1e-12 | 5.5e-15 |
+    ///
+    /// With a and b constrained to half-integer or integer values:
+    ///
+    /// | arithmetic | domain (x) | domain (a, b) | # trials | peak | rms |
+    /// | :--------: | :--------: | :-----------: | :------: | :--: | :-: |
+    /// |  IEEE      |  0,1       | .5,10000      | 50000    | 5.8e-12 | 1.1e-13 |
+    /// |  IEEE      |  0,1       | .5,100        | 100000   | 1.7e-14 | 7.9e-16 |
+    ///
+    /// With a = .5, b constrained to half-integer or integer values:
+    ///
+    /// | arithmetic | domain (x) | domain (a, b) | # trials | peak | rms |
+    /// | :--------: | :--------: | :-----------: | :------: | :--: | :-: |
+    /// |   IEEE     | 0,1        | .5,10000      | 10000    | 8.3e-11 | 1.0e-11 |
+    ///
+    /// # Arguments
+    /// * `a`: A double precision parameter, assumed to be greater than 0
+    /// * `b`: A double precision parameter, assumed to be greater than 0
+    /// * `y`: A double precision parameter, assumed to be between 0 and 1
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::incbi;
+    /// let a = 0.1f64;
+    /// let b = 0.2f64;
+    /// incbi(a, b, 0.5f64);
+    /// ```
     pub fn incbi(a: f64, b: f64, y: f64) -> f64 {
         unsafe { unsafe_cephes_double::incbi(a, b, y) }
     }
 
-    /// Gamma function.
+    /// Computes the gamma function.
+    ///
+    /// The gamma function, $\Gamma(x)$, is defined as:
+    ///
+    /// $ \Gamma(t) = \int_0^{\infty} x^{t - 1} e^{-x} dx $.
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// Arguments |x| <= 34 are reduced by recurrence and the function
+    /// approximated by a rational function of degree 6/7 in the
+    /// interval (2,3).  Large arguments are handled by Stirling's
+    /// formula. Large negative arguments are made positive using
+    /// a reflection formula.
+    ///
+    /// ACCURACY (Relative error):
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :--------: | :----: | :------: | :--: | :-: |
+    /// |    IEEE  | -170,-33    | 20000 | 2.3e-15 | 3.3e-16 |
+    /// |    IEEE  |  -33,  33   | 20000 | 9.4e-16 | 2.2e-16 |
+    /// |    IEEE  |   33, 171.6 | 20000 | 2.3e-15 | 3.2e-16 |
+    ///
+    /// Error for arguments outside the test range will be larger
+    /// owing to error amplification by the exponential function.
+    ///
+    /// # Arguments
+    /// * `x`: A double precision parameter
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::gamma;
+    /// gamma(1.0f64);
+    /// ```
     pub fn gamma(x: f64) -> f64 {
         unsafe { unsafe_cephes_double::gamma(x) }
     }
 
-    /// Reciprocal gamma function.
+    /// Computes the reciprocal gamma function.
+    ///
+    /// The reciprocal gamma function is given by:
+    ///
+    /// $ \frac{1}{\Gamma(x)} $
+    ///
+    /// where the gamma function, $\Gamma(x)$, is defined as:
+    ///
+    /// $ \Gamma(t) = \int_0^{\infty} x^{t - 1} e^{-x} dx $.
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// The function is approximated by a Chebyshev expansion in
+    /// the interval [0,1].  Range reduction is by recurrence
+    /// for arguments between -34.034 and +34.84425627277176174.
+    /// 1/MAXNUM is returned for positive arguments outside this
+    /// range.  For arguments less than -34.034 the cosecant
+    /// reflection formula is applied; lograrithms are employed
+    /// to avoid unnecessary overflow.
+    ///
+    /// The reciprocal gamma function has no singularities,
+    /// but overflow and underflow may occur for large arguments.
+    /// These conditions return either MAXNUM or 1/MAXNUM with
+    /// appropriate sign.
+    ///
+    /// ACCURACY (Relative error):
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :--------: | :----: | :------: | :--: | :-: |
+    ///    IEEE     -30,+30      30000       1.1e-15     2.0e-16
+    ///
+    /// For arguments less than -34.034 the peak error is on the
+    /// order of 5e-15 (DEC), excepting overflow or underflow.
+    /// Arguments |x| <= 34 are reduced by recurrence and the function
+    /// approximated by a rational function of degree 6/7 in the
+    /// interval (2,3).  Large arguments are handled by Stirling's
+    /// formula. Large negative arguments are made positive using
+    /// a reflection formula.
+    ///
+    /// # Arguments
+    /// * `x`: A double precision parameter
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::rgamma;
+    /// rgamma(1.0f64);
+    /// ```
     pub fn rgamma(x: f64) -> f64 {
         unsafe { unsafe_cephes_double::rgamma(x) }
     }
 
-    /// Natural logarithm of gamma function.
+    /// Computes the natural logarithm of gamma function.
+    ///
+    /// The log of the gamma function is given by:
+    ///
+    /// $ \ln\left( \Gamma(x) \right) $
+    ///
+    /// where the gamma function, $\Gamma(x)$, is defined as:
+    ///
+    /// $ \Gamma(t) = \int_0^{\infty} x^{t - 1} e^{-x} dx $.
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// For arguments greater than 13, the logarithm of the gamma
+    /// function is approximated by the logarithmic version of
+    /// Stirling's formula using a polynomial approximation of
+    /// degree 4. Arguments between -33 and +33 are reduced by
+    /// recurrence to the interval [2,3] of a rational approximation.
+    /// The cosecant reflection formula is employed for arguments
+    /// less than -33.
+    ///
+    /// Arguments greater than MAXLGM return MAXNUM and an error
+    /// message.  MAXLGM = 2.035093e36 for DEC
+    /// arithmetic or 2.556348e305 for IEEE arithmetic.
+    ///
+    /// ACCURACY:
+    ///
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :--------: | :----: | :------: | :--: | :-: |
+    /// |  IEEE  | 0, 3             |   28000  |  5.4e-16  |  1.1e-16 |
+    /// |  IEEE  | 2.718, 2.556e305 |   40000  |  3.5e-16  |  8.3e-17 |
+    ///
+    /// The error criterion was relative when the function magnitude
+    /// was greater than one but absolute when it was less than one.
+    ///
+    /// The following test used the relative error criterion, though
+    /// at certain points the relative error could be much higher than
+    /// indicated.
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :--------: | :----: | :------: | :--: | :-: |
+    /// | IEEE |   -200, -4   |   10000  | 4.8e-16  |   1.3e-16 |
+    ///
+    /// # Arguments
+    /// * `x`: A double precision parameter
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::lgam;
+    /// lgam(1.0f64);
+    /// ```
     pub fn lgam(x: f64) -> f64 {
         unsafe { unsafe_cephes_double::lgam(x) }
     }
 
-    /// Regularized incomplete gamma integral.
+    /// Computes the regularized incomplete gamma integral.
+    ///
+    /// The regularized incomplete gamma function is given by:
+    ///
+    /// $ \gamma(a, x) = \frac{1}{\Gamma{a}} \int_0^{x} t^{a - 1} e^{-t} dt $
+    ///
+    /// where the gamma function, $\Gamma(a)$, is defined as:
+    ///
+    /// $ \Gamma(a) = \int_0^{\infty} x^{a - 1} e^{-x} dx $.
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// In this implementation both arguments must be positive.
+    /// The integral is evaluated by either a power series or
+    /// continued fraction expansion, depending on the relative
+    /// values of a and x.
+    ///
+    /// ACCURACY (Relative error):
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :--------: | :----: | :------: | :--: | :-: |
+    /// |  IEEE      |  0,30  |  200000  | 3.6e-14 | 2.9e-15 |
+    /// |  IEEE      |  0,100 |  300000  | 9.9e-14 | 1.5e-14 |
+    ///
+    /// # Arguments
+    /// * `a`: a double precision parameter, assumed to be > 0
+    /// * `x`: A double precision parameter, assumed to be > 0
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::igam;
+    /// igam(0.5f64, 1.0f64);
+    /// ```
     pub fn igam(a: f64, x: f64) -> f64 {
         unsafe { unsafe_cephes_double::igam(a, x) }
     }
 
-    /// Complemented incomplete gamma integral.
+    /// Computes the complemented regularized incomplete gamma integral.
+    ///
+    /// The regularized incomplete gamma function is given by:
+    ///
+    /// $ \Gamma(a, x) = \frac{1}{\Gamma{a}} \int_x^{\infty} t^{a - 1} e^{-t} dt $
+    ///
+    /// which reduces to:
+    ///
+    /// $ \Gamma(a, x) = 1 - \frac{1}{\Gamma{a}} \int_0^{x} t^{a - 1} e^{-t} dt $
+    ///
+    /// where the gamma function, $\Gamma(a)$, is defined as:
+    ///
+    /// $ \Gamma(a) = \int_0^{\infty} x^{a - 1} e^{-x} dx $.
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// In this implementation both arguments must be positive.
+    /// The integral is evaluated by either a power series or
+    /// continued fraction expansion, depending on the relative
+    /// values of a and x.
+    ///
+    /// ACCURACY (Relative error, tested at random a, x):
+    ///
+    /// | arithmetic | domain (a) | domain (x) | # trials | peak | rms |
+    /// | :--------: | :----: | :----------: | :------: | :--: | :-: |
+    /// |  IEEE      | 0.5,100 |  0,100  |   200000 | 1.9e-14 | 1.7e-15 |
+    /// |  IEEE      | 0.01,0.5 | 0,100  |   200000 | 1.4e-13 | 1.6e-15 |
+    ///
+    /// # Arguments
+    /// * `a`: a double precision parameter, assumed to be > 0
+    /// * `x`: A double precision parameter, assumed to be > 0
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::igamc;
+    /// igamc(0.5f64, 1.0f64);
+    /// ```
     pub fn igamc(a: f64, x: f64) -> f64 {
         unsafe { unsafe_cephes_double::igamc(a, x) }
     }
 
-    /// Inverse of complemented incomplete gamma integral.
+    /// Computes the inverse of complemented incomplete gamma integral.
+    ///
+    /// This function finds the value `x` for a given p where
+    /// `p = igamc(a, p)`, where `igamc` is the regularized incomplete gamma
+    /// function, which is given by
+    ///
+    /// $ \Gamma(a, x) = \frac{1}{\Gamma{a}} \int_x^{\infty} t^{a - 1} e^{-t} dt $
+    ///
+    /// where the gamma function, $\Gamma(a)$, is defined as:
+    ///
+    /// $ \Gamma(a) = \int_0^{\infty} x^{a - 1} e^{-x} dx $.
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// It is valid in the right-hand tail of the distribution, p < 0.5.
+    /// Starting with the approximate value
+    ///
+    /// $ x = a t^3 $
+    ///
+    ///  where
+    ///
+    ///  $t = 1 - d - ndtri(p) \sqrt{d}$
+    ///
+    /// and
+    ///
+    ///  $d = 1/9a$,
+    ///
+    /// the routine performs up to 10 Newton iterations to find the
+    /// root of igamc(a,x) - p = 0.
+    ///
+    /// ACCURACY (Relative Error):
+    ///
+    /// Tested at random a, p in the intervals indicated.
+    ///
+    /// | arithmetic | domain (a) | domain (x) | # trials | peak | rms |
+    /// | :--------: | :----: | :----------: | :------: | :--: | :-: |
+    /// |  IEEE      | 0.5,100 |  0,100  |   200000 | 1.0e-14 | 1.7e-15 |
+    /// |  IEEE      | 0.01,0.5 | 0,100  |   200000 | 9.0e-14 | 3.4e-15 |
+    /// |  IEEE      | 0.5,10000 | 0,0.5  |  20000  | 2.3e-13 | 3.8e-14 |
+    ///
+    /// # Arguments
+    /// * `a`: a double precision parameter, assumed to be > 0
+    /// * `p`: A double precision parameter, assumed to be > 0
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::igami;
+    /// igami(0.5f64, 1.0f64);
+    /// ```
     pub fn igami(a: f64, p: f64) -> f64 {
         unsafe { unsafe_cephes_double::igami(a, p) }
     }
 
-    /// Psi (digamma) function.
+    /// Computes the psi (digamma) function.
+    ///
+    /// The digamma function is simply the derivative of the natural log of the
+    /// gamma function:
+    ///
+    /// $\psi(x) = \frac{d \ln\left(\Gamma(x)\right\right)}{dx}$
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// For integer x,
+    ///
+    /// $ \psi(x) = -\gamma + \sum_{k=1}^{n-1}\frac{1}{k} $
+    ///
+    /// This formula is used for $0 < x \le 10$.  If x is negative, it
+    /// is transformed to a positive argument by the reflection
+    /// formula  $\psi(1-x) = \psi(x) + \pi \cot(\pi x)$.
+    ///
+    /// For general positive x, the argument is made greater than 10
+    /// using the recurrence  $\psi(x+1) = \psi(x) + 1/x$.
+    /// Then the following asymptotic expansion is applied:
+    ///
+    /// $\psi(x) = \ln(x) - \frac{1}{2x} \sum^{\infty}_{k=1} \frac{B_{2k}}{2k x^{2k}} $
+    ///
+    /// where the $B_{2k}$ are Bernoulli numbers.
+    ///
+    /// ACCURACY (Relative error (except absolute when |psi| < 1)):
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :----: | :---:     | :---:    | :---: | :--: |
+    /// |   IEEE |  0,30  | 30000 | 1.3e-15 | 1.4e-16 |
+    /// |   IEEE |  -30,0 | 40000 | 1.5e-15 | 2.2e-16 |
+    ///
+    /// ERROR MESSAGES:
+    ///
+    /// | message | condition | value returned |
+    /// | :------: | :-----: | :-----: |
+    /// | psi singularity | x integer <=0 | MAXNUM|
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::psi;
+    /// psi(4.0f64);
+    /// ```
     pub fn psi(x: f64) -> f64 {
         unsafe { unsafe_cephes_double::psi(x) }
     }
 
-    /// Factorial function.
+    /// Computes the factorial function.
+    ///
+    /// The factorial function returns the factorial of i, the input argument
+    /// where the factorial is defined as:
+    ///
+    /// $ i! = \Pi_k^i k $
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// Due to machine arithmetic bounds the largest value of
+    /// i 170 in IEEE arithmetic.  Greater values, or negative ones,
+    /// produce an error message and return MAXNUM.
+    ///
+    /// ACCURACY (Relative Error):
+    ///
+    /// For i < 34 the values are simply tabulated, and have
+    /// full machine accuracy.  If i > 55, fac(i) = gamma(i+1);
+    /// see gam for more information.
+    ///
+    /// | arithmetic  | domain    |  peak|
+    /// | :---: | :---: | :---: |
+    /// | IEEE  | 0, 170 | 1.4e-15 |
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::fac;
+    /// fac(4i32);
+    /// ```
     pub fn fac(i: i32) -> f64 {
         unsafe { unsafe_cephes_double::fac(i) }
     }
