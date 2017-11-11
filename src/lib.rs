@@ -1044,6 +1044,9 @@ pub mod cephes_double {
     /// | :------: | :-----: | :-----: |
     /// | psi singularity | x integer <=0 | MAXNUM|
     ///
+    /// # Arguments
+    /// * `x`: a double precision parameter
+    ///
     /// # Example
     /// ```
     /// use special_fun::cephes_double::psi;
@@ -1075,6 +1078,10 @@ pub mod cephes_double {
     /// | arithmetic  | domain    |  peak|
     /// | :---: | :---: | :---: |
     /// | IEEE  | 0, 170 | 1.4e-15 |
+    ///
+    /// # Arguments
+    /// * `i`: an integer parameter
+    ///
     /// # Example
     /// ```
     /// use special_fun::cephes_double::fac;
@@ -1083,6 +1090,301 @@ pub mod cephes_double {
     pub fn fac(i: i32) -> f64 {
         unsafe { unsafe_cephes_double::fac(i) }
     }
+
+    /// Computes the Bessel function of the first kind of order zero.
+    ///
+    /// The Bessel of the first kind of order zero has many possible
+    /// representations but a convenient integral representation is the
+    /// following:
+    ///
+    /// $ \J_0(z) = \frac{1}{\pi} \int_0^{\pi} \cos(z \sin(\theta)) d \theta $
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// The domain is divided into the intervals [0, 5] and
+    /// (5, infinity). In the first interval the following rational
+    /// approximation is used:
+    ///
+    /// $ \frac{\left(w - r_1^2\right) \left( w - r^2_2 \right) P_3(w)}{Q_8(w)}$
+    ///
+    /// where $w = x^2$  and the two r's are zeros of the function.
+    ///
+    /// In the second interval, the Hankel asymptotic expansion
+    /// is employed with two rational functions of degree 6/6
+    /// and 7/7.
+    ///
+    /// ACCURACY (Absolute error):
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :--:       | :---:  | :---:    | :--:| :--: |
+    /// | IEEE | 0, 30 | 60000 | 4.2e-16 | 1.1e-16 |
+    ///
+    /// # Arguments
+    /// * `x`: a double precision parameter
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::j0;
+    /// j0(1.0f64);
+    /// ```
+    pub fn j0(x: f64) -> f64 {
+        unsafe { unsafe_cephes_double::j0(x) }
+    }
+
+    /// Computes the Bessel function of the first kind of order one.
+    ///
+    /// The Bessel of the first kind of order one has many possible
+    /// representations but a convenient integral representation is the
+    /// following:
+    ///
+    /// $ \J_1(z) = \frac{1}{\pi} \int_0^{\pi} \cos(z \sin(\theta) - \theta) d \theta $
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// The domain is divided into the intervals [0, 8] and
+    /// (8, infinity). In the first interval a 24 term Chebyshev
+    /// expansion is used. In the second, the asymptotic
+    /// trigonometric representation is employed using two
+    /// rational functions of degree 5/5.
+    ///
+    /// ACCURACY (Absolute error):
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :--:       | :---:  | :---:    | :--:| :--: |
+    /// | IEEE | 0, 30 | 30000 | 2.6e-16 | 1.1e-16 |
+    ///
+    /// # Arguments
+    /// * `x`: a double precision parameter
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::j1;
+    /// j1(1.0f64);
+    /// ```
+    pub fn j1(x: f64) -> f64 {
+        unsafe { unsafe_cephes_double::j1(x) }
+    }
+
+    /// Computes the Bessel function of the first kind of nth integer order.
+    ///
+    /// The Bessel of the first kind of nth order has many possible
+    /// representations but a convenient integral representation is the
+    /// following:
+    ///
+    /// $ \J_n(z) = \frac{1}{\pi} \int_0^{\pi} \cos(z \sin(\theta) - n \theta) d \theta $
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// Returns Bessel function of order n, where n is a
+    /// (possibly negative) integer.
+    ///
+    /// The ratio of $N_n(x)$ to $J_0(x)$ is computed by backward
+    /// recurrence.  First the ratio $J_n/J_{n-1}$ is found by a
+    /// continued fraction expansion.  Then the recurrence
+    /// relating successive orders is applied until $j_0$ or $j_1$ is
+    /// reached.
+    ///
+    /// If n = 0 or 1 the routine for j0 or j1 is called
+    /// directly.
+    ///
+    /// ACCURACY (Absolute error):
+    ///
+    /// | arithmetic | domain | # trials | peak | rms |
+    /// | :--:       | :---:  | :---:    | :--:| :--: |
+    /// | IEEE | 0, 30 | 5000 | 4.4e-16 | 7.9e-17 |
+    ///
+    /// Not suitable for large n or x. Use jv() instead.
+    ///
+    /// # Arguments
+    /// * `n`: an integer parameter
+    /// * `x`: a double precision parameter
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::jn;
+    /// jn(2i32, 1.0f64);
+    /// ```
+    pub fn jn(n: i32, x: f64) -> f64 {
+        unsafe { unsafe_cephes_double::jn(n, x) }
+    }
+
+    /// Computes the Bessel function of the first kind of vth real order.
+    ///
+    /// The Bessel of the first kind of vth order has many possible
+    /// representations but a series representation is the following:
+    ///
+    /// $ J_v(x) = \sum_{m=0}^{\infty} \frac{(-1)^m}{ m! \Gamma(m + v + 1)} \left( \frac{x}{2} \right)^{2m + v}$
+    ///
+    /// where $\Gamma$ is the gamma function.
+    ///
+    /// # Original Description from Stephen L. Moshier
+    ///
+    /// Returns Bessel function of order v of the argument,
+    /// where v is real.  Negative x is allowed if v is an integer.
+    ///
+    /// Several expansions are included: the ascending power
+    /// series, the Hankel expansion, and two transitional
+    /// expansions for large v.  If v is not too large, it
+    /// is reduced by recurrence to a region of best accuracy.
+    /// The transitional expansions give 12D accuracy for v > 500.
+    ///
+    /// ACCURACY:
+    /// Results for integer v are indicated by *, where x and v
+    /// both vary from -125 to +125.  Otherwise,
+    /// x ranges from 0 to 125, v ranges as indicated by "domain."
+    /// Error criterion is absolute, except relative when |jv()| > 1.
+    ///
+    /// | arithmetic | v domain | x domain | # trials | peak | rms |
+    /// | :------:   | :-----:  | :----:   | :----:   | :---: | :--: |
+    /// | IEEE       | 0,125    | 0,125    | 100000   | 4.6e-15 | 2.2e-16 |
+    /// | IEEE | -125,0 | 0,125 | 40000 | 5.4e-11 | 3.7e-13 |
+    /// | IEEE | 0,500 | 0,500 | 20000 | 4.4e-15 | 4.0e-16 |
+    ///
+    /// Integer v:
+    ///
+    /// | arithmetic | v domain | x domain | # trials | peak | rms |
+    /// | :------:   | :-----:  | :----:   | :----:   | :---: | :--: |
+    /// | IEEE | -125,125 | -125,125 | 50000 | 3.5e-15* | 1.9e-16* |
+    ///
+    /// # Arguments
+    /// * `v`: a double precision parameter
+    /// * `x`: a double precision parameter
+    ///
+    /// # Example
+    /// ```
+    /// use special_fun::cephes_double::jv;
+    /// jv(2.0f64, 1.0f64);
+    /// ```
+    pub fn jv(n: f64, x: f64) -> f64 {
+        unsafe { unsafe_cephes_double::jv(n, x) }
+    }
+
+    /*
+        /// Bessel function of the second kind, order zero.
+        pub fn y0(x: f64) -> f64;
+        /// Bessel function of the second kind, order one.
+        pub fn y1(x: f64) -> f64;
+        /// Bessel function of the second kind, integer order.
+        pub fn yn(n: i32, x: f64) -> f64;
+        /// Bessel function of the second kind, real order.
+        pub fn yv(v: f64, x: f64) -> f64;
+
+        /// Modified Bessel function of order zero.
+        pub fn i0(x: f64) -> f64;
+        /// Modified Bessel function of order zero, exponentially scaled.
+        pub fn i0e(x: f64) -> f64;
+        /// Modified Bessel function of order one.
+        pub fn i1(x: f64) -> f64;
+        /// Modified Bessel function of order one, exponentially scaled.
+        pub fn i1e(x: f64) -> f64;
+        /// Modified Bessel function of real order.
+        pub fn iv(v: f64, x: f64) -> f64;
+
+        /// Modified Bessel function of the third kind, order zero.
+        pub fn k0(x: f64) -> f64;
+        /// Modified Bessel function of the third kind, order zero,
+        /// exponentially scaled.
+        pub fn k0e(x: f64) -> f64;
+        /// Modified Bessel function of the third kind, order one.
+        pub fn k1(x: f64) -> f64;
+        /// Modified Bessel function of the third kind, order one,
+        /// exponentially scaled.
+        pub fn k1e(x: f64) -> f64;
+        /// Modified Bessel function of the third kind, integer order.
+        pub fn kn(n: i32, x: f64) -> f64;
+
+        // Elliptic functions
+        /// Incomplete elliptic integral of the first kind.
+        pub fn ellik(phi: f64, m: f64) -> f64;
+        /// Incomplete elliptic integral of the second kind.
+        pub fn ellie(phi: f64, m: f64) -> f64;
+        /// Complete elliptic integral of the first kind.
+        pub fn ellpk(m1: f64) -> f64;
+        /// Complete elliptic integral of the second kind.
+        pub fn ellpe(m1: f64) -> f64;
+        /// Jacobian elliptic function.
+        pub fn ellpj(u: f64, m: f64, sn: &mut f64, cn: &mut f64, dn: &mut f64, phi: &mut f64) -> i32;
+
+        // Hypergeometric functions
+        /// Confluent hypergeometric function 1F1.
+        pub fn hyperg(a: f64, b: f64, x: f64) -> f64;
+        /// Hypergeometric function 1F2.
+        pub fn onef2(a: f64, b: f64, c: f64, x: f64, err: &mut f64) -> f64;
+        /// Gauss hypergeometric function 2F1.
+        pub fn hyp2f1(a: f64, b: f64, c: f64, x: f64) -> f64;
+        /// Hypergeometric function 3F0.
+        pub fn threef0(a: f64, b: f64, c: f64, x: f64, err: &mut f64) -> f64;
+
+        // Distributions
+        /// Binomial distribution.
+        pub fn bdtr(k: i32, n: i32, p: f64) -> f64;
+        /// Complemented binomial distribution.
+        pub fn bdtrc(k: i32, n: i32, p: f64) -> f64;
+        /// Inverse of binomial distribution.
+        pub fn bdtri(k: i32, n: i32, y: f64) -> f64;
+
+        /// Negative binomial distribution.
+        pub fn nbdtr(k: i32, n: i32, p: f64) -> f64;
+        /// Complemented negative binomial distribution.
+        pub fn nbdtrc(k: i32, n: i32, p: f64) -> f64;
+        /// Inverse of negative binomial distribution.
+        pub fn nbdtri(k: i32, n: i32, p: f64) -> f64;
+
+        /// Beta distribution.
+        pub fn btdtr(a: f64, b: f64, x: f64) -> f64;
+
+        /// Chi-square distribution.
+        pub fn chdtr(df: f64, x: f64) -> f64;
+        /// Complemented chi-square distribution.
+        pub fn chdtrc(v: f64, x: f64) -> f64;
+        /// Inverse of complemented chi-square distribution.
+        pub fn chdtri(df: f64, y: f64) -> f64;
+
+        /// F distribution.
+        pub fn fdtr(df1: i32, df2: i32, x: f64) -> f64;
+        /// Complemented F distribution.
+        pub fn fdtrc(df1: i32, df2: i32, x: f64) -> f64;
+        /// Inverse of complemented F distribution.
+        pub fn fdtri(df1: i32, df2: i32, p: f64) -> f64;
+
+        /// Gamma distribution.
+        pub fn gdtr(a: f64, b: f64, x: f64) -> f64;
+        /// Complemented gamma distribution.
+        pub fn gdtrc(a: f64, b: f64, x: f64) -> f64;
+
+        /// Normal distribution.
+        pub fn ndtr(x: f64) -> f64;
+        /// Inverse of normal distribution.
+        pub fn ndtri(y: f64) -> f64;
+
+        /// Poisson distribution.
+        pub fn pdtr(k: i32, m: f64) -> f64;
+        /// Complemented Poisson distribution.
+        pub fn pdtrc(k: i32, m: f64) -> f64;
+        /// Inverse of Poisson distribution.
+        pub fn pdtri(k: i32, y: f64) -> f64;
+
+        /// Student's t distribution.
+        pub fn stdtr(k: i16, t: f64) -> f64;
+        /// Inverse of Student's t distribution.
+        pub fn stdtri(k: i32, p: f64) -> f64;
+
+        // Misc special functions
+        /// Airy function.
+        pub fn airy(x: f64, ai: &mut f64, aip: &mut f64, bi: &mut f64, bip: &mut f64) -> i32;
+        /// Dawson's integral.
+        pub fn dawsn(x: f64) -> f64;
+        /// Fresnel integral.
+        pub fn fresnl(x: f64, s: &mut f64, c: &mut f64);
+        /// Integral of Planck's black body radiation formula.
+        pub fn plancki(lambda: f64, temperature: f64) -> f64;
+        /// Struve function.
+        pub fn struve(v: f64, x: f64) -> f64;
+        /// Riemann zeta function.
+        pub fn zetac(x: f64) -> f64;
+        /// Riemann zeta function of two arguments.
+        pub fn zeta(x: f64, q: f64) -> f64;
+    */
 }
 
 // single precision
